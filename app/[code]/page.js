@@ -2,14 +2,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 
-// ضع رابط الـ Direct Link أو Pop-up الخاص بك هنا (من Adsterra أو Monetag)
-const POPUP_AD_URL = 'https://www.google.com'; 
+// ضع رابط البوب أب / Direct Link الخاص بك هنا
+const POPUP_AD_URL = 'https://www.google.com';
 
-export default function GamingSafeRedirect({ params }) {
+export default function FastUltraRedirect({ params }) {
   const { code } = params;
   const [destination, setDestination] = useState('');
   const [step, setStep] = useState(1);
-  const [timeLeft, setTimeLeft] = useState(6);
+  const [mainTimer, setMainTimer] = useState(15);
+  const [subTimer1, setSubTimer1] = useState(0);
+  const [subTimer2, setSubTimer2] = useState(0);
+  const [step1Passed, setStep1Passed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -30,278 +33,173 @@ export default function GamingSafeRedirect({ params }) {
       setDestination(data.original_url);
       setLoading(false);
 
-      await supabase
-        .from('urls')
-        .update({ clicks: (data.clicks || 0) + 1 })
-        .eq('short_code', code);
+      // تسجيل النقرة العامة وتاريخ النقرة للإحصائيات الشهرية واليومية
+      await supabase.from('urls').update({ clicks: (data.clicks || 0) + 1 }).eq('short_code', code);
+      await supabase.from('click_logs').insert([{ short_code: code }]);
     }
 
     fetchUrl();
   }, [code]);
 
+  // العداد الرئيسي 15 ثانية
   useEffect(() => {
-    if (loading || error || timeLeft <= 0) return;
+    if (loading || error || mainTimer <= 0) return;
+    const timer = setInterval(() => setMainTimer((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [loading, error, mainTimer]);
+
+  // عداد الضغطة الأولى 5 ثواني
+  useEffect(() => {
+    if (subTimer1 <= 0) return;
     const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      setSubTimer1((prev) => {
+        if (prev === 1) setStep1Passed(true);
+        return prev - 1;
+      });
     }, 1000);
     return () => clearInterval(timer);
-  }, [loading, error, timeLeft]);
+  }, [subTimer1]);
 
-  // دالة فتح إعلان البوب أب والانتقال للخطوة التالية
-  const handleStepWithPopup = () => {
-    if (timeLeft > 0) return;
+  // عداد الضغطة الثانية 5 ثواني
+  useEffect(() => {
+    if (subTimer2 <= 0) return;
+    const timer = setInterval(() => {
+      setSubTimer2((prev) => {
+        if (prev === 1) {
+          if (step < 3) {
+            setStep((s) => s + 1);
+            setMainTimer(15);
+            setStep1Passed(false);
+          } else {
+            window.location.href = destination;
+          }
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [subTimer2, step, destination]);
 
-    // فتح صفحة الإعلان في تبويب جديد (Pop-up/Direct Link)
-    if (POPUP_AD_URL && POPUP_AD_URL !== '') {
-      window.open(POPUP_AD_URL, '_blank');
-    }
-
-    // الانتقال للخطوة التالية
-    setStep((prev) => prev + 1);
-    setTimeLeft(6);
+  const triggerButton1 = () => {
+    if (POPUP_AD_URL) window.open(POPUP_AD_URL, '_blank');
+    setSubTimer1(5);
   };
 
-  // دالة فتح الإعلان عند نقر الزر النهائي
-  const handleFinalClick = () => {
-    if (POPUP_AD_URL && POPUP_AD_URL !== '') {
-      window.open(POPUP_AD_URL, '_blank');
-    }
+  const triggerButton2 = () => {
+    if (POPUP_AD_URL) window.open(POPUP_AD_URL, '_blank');
+    setSubTimer2(5);
   };
 
   if (error) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px', background: '#0a0d14', color: '#ff4b4b', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <h1 style={{ fontSize: '32px', textShadow: '0 0 10px #ff4b4b' }}>404 - الرابط غير صالح!</h1>
-        <p style={{ color: '#94a3b8' }}>ربما تم حذف هذا الرابط أو انتهت صلاحيته.</p>
-        <a href="/" style={{ color: '#00f0ff', textDecoration: 'none', border: '1px solid #00f0ff', padding: '10px 24px', borderRadius: '8px', marginTop: '20px' }}>العودة للرئيسية</a>
+      <div style={{ textAlign: 'center', padding: '50px' }}>
+        <h2 style={{ color: '#ef4444' }}>الرابط غير موجود أو تم حذفه</h2>
+        <a href="/" style={{ color: '#38bdf8' }}>العودة للرئيسية</a>
       </div>
     );
   }
 
   return (
-    <div style={{
-      width: '100%',
-      minHeight: '100vh',
-      backgroundColor: '#07090e',
-      backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.12) 0%, transparent 60%)',
-      color: '#f8fafc',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '16px',
-      boxSizing: 'border-box'
-    }}>
-
-      {/* شارة الهيدر الجيمنج (AHM X & YOUSSEF 999) */}
+    <div style={{ width: '100%', maxWidth: '650px', padding: '12px', boxSizing: 'border-box' }}>
+      
+      {/* شارة الهوية */}
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        margin: '12px 0 20px 0',
-        padding: '10px 24px',
-        background: 'linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(0, 240, 255, 0.15))',
-        border: '1px solid rgba(0, 240, 255, 0.4)',
-        borderRadius: '50px',
-        boxShadow: '0 0 20px rgba(0, 240, 255, 0.2)'
-      }}>
-        <span style={{ fontWeight: '900', fontSize: '17px', color: '#00f0ff', letterSpacing: '1px', textShadow: '0 0 12px #00f0ff' }}>AHM X</span>
-        <span style={{ color: '#ff0055', fontWeight: 'bold' }}>⚡</span>
-        <span style={{ fontWeight: '900', fontSize: '17px', color: '#ff0055', letterSpacing: '1px', textShadow: '0 0 12px #ff0055' }}>YOUSSEF 999</span>
-      </div>
-
-      {/* مساحة إعلانية 1: علوية رئيسية */}
-      <div style={{
-        width: '100%',
-        maxWidth: '728px',
-        minHeight: '75px',
-        background: 'rgba(15, 23, 42, 0.7)',
-        border: '1px dashed #00f0ff',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#00f0ff',
-        fontSize: '12px',
-        marginBottom: '16px'
-      }}>
-        [ إعلان 1: Top Leaderboard 728x90 ]
-      </div>
-
-      {/* مساحة إعلانية 2: شريط فرعي */}
-      <div style={{
-        width: '100%',
-        maxWidth: '728px',
-        minHeight: '50px',
-        background: 'rgba(15, 23, 42, 0.5)',
-        border: '1px dashed #ff0055',
-        borderRadius: '8px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#ff0055',
-        fontSize: '12px',
-        marginBottom: '20px'
-      }}>
-        [ إعلان 2: Banner 468x60 / Social Bar ]
-      </div>
-
-      {/* الحاوية الأساسية للعبة والتخطي */}
-      <div style={{
-        width: '100%',
-        maxWidth: '600px',
-        background: 'linear-gradient(180deg, #0d121f 0%, #080b14 100%)',
-        borderRadius: '20px',
-        padding: '28px 20px',
-        border: '1px solid #1e293b',
-        boxShadow: '0 0 35px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 240, 255, 0.05)',
         textAlign: 'center',
-        position: 'relative'
+        padding: '10px',
+        backgroundColor: '#0f172a',
+        border: '1px solid #1e293b',
+        borderRadius: '30px',
+        margin: '10px 0'
       }}>
+        <span style={{ color: '#00e5ff', fontWeight: 'bold' }}>AHM X</span>
+        <span style={{ color: '#ff0055', margin: '0 8px' }}>⚡</span>
+        <span style={{ color: '#ff0055', fontWeight: 'bold' }}>YOUSSEF 999</span>
+      </div>
 
-        {/* شريط مستويات التقدم (Step Indicators) */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
-          {[1, 2, 3].map((s) => (
-            <div key={s} style={{
-              flex: 1,
-              height: '6px',
-              borderRadius: '4px',
-              background: step >= s ? (step === 3 ? '#10b981' : '#00f0ff') : '#1e293b',
-              boxShadow: step >= s ? '0 0 10px #00f0ff' : 'none',
-              transition: '0.4s'
-            }} />
-          ))}
-        </div>
+      {/* إعلان 1: علوي */}
+      <div style={{ background: '#0f172a', border: '1px dashed #38bdf8', padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '16px', borderRadius: '8px' }}>
+        [ مساحة إعلانية 1: علوية رئيسية 728x90 ]
+      </div>
 
-        <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#ffffff', marginBottom: '8px' }}>
-          {step === 1 && '🎮 المرحلة 1: جاري التحقق من أمان الخادم...'}
-          {step === 2 && '⚡ المرحلة 2: جاري فك تشفير البيانات...'}
-          {step === 3 && '🔥 المرحلة 3: تم تجهيز الرابط بنجاح!'}
-        </h2>
-        
-        <p style={{ color: '#94a3b8', fontSize: '13px', marginBottom: '20px' }}>
-          انتظر انتهاء العد التنازلي لفتح بوابة النقل
+      {/* إعلان 2 */}
+      <div style={{ background: '#0f172a', border: '1px dashed #ff0055', padding: '14px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px', borderRadius: '8px' }}>
+        [ مساحة إعلانية 2: شريط إعلاني 468x60 ]
+      </div>
+
+      {/* صندوق العداد والزر الأول */}
+      <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#00e5ff' }}>
+          المرحلة ({step}/3): فحص السيرفر وتجهيز الرابط
+        </h3>
+        <p style={{ color: '#94a3b8', fontSize: '13px' }}>
+          العداد الأساسي: <b style={{ color: '#fff', fontSize: '18px' }}>{mainTimer}</b> ثانية
         </p>
 
-        {/* مساحة إعلانية 3: في قلب الصندوق */}
-        <div style={{
-          background: 'rgba(0, 0, 0, 0.4)',
-          border: '1px dashed #334155',
-          borderRadius: '10px',
-          padding: '20px',
-          color: '#64748b',
-          fontSize: '12px',
-          margin: '0 auto 20px auto'
-        }}>
-          [ إعلان 3: داخل الصندوق Native / 300x250 ]
-        </div>
-
-        {/* دائرة العداد الجيمنج المضيئة */}
-        <div style={{
-          width: '75px',
-          height: '75px',
-          borderRadius: '50%',
-          border: '3px solid #00f0ff',
-          boxShadow: '0 0 15px #00f0ff, inset 0 0 15px rgba(0, 240, 255, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 24px auto',
-          fontSize: '26px',
-          fontWeight: '900',
-          color: '#00f0ff'
-        }}>
-          {timeLeft > 0 ? timeLeft : '✓'}
-        </div>
-
-        {/* أزرار التحويل الذكية مع Pop-up */}
-        {step < 3 ? (
-          <button
-            onClick={handleStepWithPopup}
-            disabled={timeLeft > 0}
-            style={{
-              padding: '16px 28px',
-              borderRadius: '12px',
-              border: 'none',
-              background: timeLeft > 0 
-                ? '#1e293b' 
-                : 'linear-gradient(90deg, #00f0ff, #0070f3)',
-              color: timeLeft > 0 ? '#64748b' : '#000000',
-              fontSize: '16px',
-              fontWeight: '900',
-              letterSpacing: '0.5px',
-              cursor: timeLeft > 0 ? 'not-allowed' : 'pointer',
-              boxShadow: timeLeft > 0 ? 'none' : '0 0 25px rgba(0, 240, 255, 0.5)',
-              width: '100%',
-              maxWidth: '340px',
-              transition: '0.3s'
-            }}
-          >
-            {timeLeft > 0 ? `انتظر (${timeLeft}) ثوانٍ...` : `المتابعة للمرحلة (${step + 1}/3) ❯`}
-          </button>
-        ) : (
-          <a
-            href={timeLeft > 0 ? '#' : destination}
-            onClick={handleFinalClick}
-            style={{
-              display: 'inline-block',
-              padding: '16px 28px',
-              borderRadius: '12px',
-              background: timeLeft > 0 
-                ? '#1e293b' 
-                : 'linear-gradient(90deg, #10b981, #059669)',
-              color: timeLeft > 0 ? '#64748b' : '#ffffff',
-              fontSize: '17px',
-              fontWeight: '900',
-              textDecoration: 'none',
-              boxShadow: timeLeft > 0 ? 'none' : '0 0 25px rgba(16, 185, 129, 0.5)',
-              width: '100%',
-              maxWidth: '340px',
-              boxSizing: 'border-box',
-              cursor: timeLeft > 0 ? 'not-allowed' : 'pointer',
-              transition: '0.3s'
-            }}
-          >
-            {timeLeft > 0 ? `انتظر (${timeLeft}) ثوانٍ...` : 'انتقل إلى الرابط المباشر 🚀'}
-          </a>
-        )}
+        {/* الزر الأول (في أعلى الصفحة) */}
+        <button
+          onClick={triggerButton1}
+          disabled={subTimer1 > 0 || step1Passed}
+          style={{
+            padding: '12px 24px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: step1Passed ? '#10b981' : subTimer1 > 0 ? '#334155' : '#0284c7',
+            color: '#fff',
+            fontWeight: 'bold',
+            fontSize: '14px',
+            cursor: step1Passed || subTimer1 > 0 ? 'default' : 'pointer',
+            width: '100%',
+            marginTop: '10px'
+          }}
+        >
+          {step1Passed ? '✓ تم التحقق من الجزء الأول' : subTimer1 > 0 ? `جاري التأكيد (${subTimer1})...` : '1. اضغط هنا لتأكيد الأمان (5 ثوانٍ)'}
+        </button>
       </div>
 
-      {/* مساحة إعلانية 4: أسفل الصندوق */}
-      <div style={{
-        width: '100%',
-        maxWidth: '600px',
-        minHeight: '90px',
-        background: 'rgba(15, 23, 42, 0.7)',
-        border: '1px dashed #00f0ff',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#00f0ff',
-        fontSize: '12px',
-        marginTop: '20px'
-      }}>
-        [ إعلان 4: Banner 300x250 / Native Widget ]
+      {/* إعلان 3: في الوسط */}
+      <div style={{ background: '#0f172a', border: '1px dashed #38bdf8', padding: '18px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', margin: '20px 0', borderRadius: '8px' }}>
+        [ مساحة إعلانية 3: داخل المحتوى 300x250 ]
       </div>
 
-      {/* مساحة إعلانية 5: أسفل الصفحة بالكامل */}
-      <div style={{
-        width: '100%',
-        maxWidth: '728px',
-        minHeight: '75px',
-        background: 'rgba(15, 23, 42, 0.5)',
-        border: '1px dashed #ff0055',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#ff0055',
-        fontSize: '12px',
-        marginTop: '16px',
-        marginBottom: '30px'
-      }}>
-        [ إعلان 5: Footer Sticky Banner 728x90 ]
+      {/* فاصل مسافة إجباري لضمان نزول المستخدم وتصفح الإعلانات */}
+      <div style={{ height: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569', fontSize: '12px' }}>
+        ↓ انزل لأسفل الصفحة للمتابعة ↓
+      </div>
+
+      {/* إعلان 4 */}
+      <div style={{ background: '#0f172a', border: '1px dashed #ff0055', padding: '18px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px', borderRadius: '8px' }}>
+        [ مساحة إعلانية 4: قبل الزر النهائي 300x250 ]
+      </div>
+
+      {/* الصندوق السفلي والزر الثاني */}
+      <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+        <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 12px 0' }}>
+          {!step1Passed ? '⚠️ يجب الضغط على الزر الأول بالأعلى أولاً' : mainTimer > 0 ? `انتظر انتهاء العداد العام (${mainTimer} ثانية)` : 'الزر جاهز للمتابعة!'}
+        </p>
+
+        {/* الزر الثاني (في أسفل الصفحة) */}
+        <button
+          onClick={triggerButton2}
+          disabled={!step1Passed || mainTimer > 0 || subTimer2 > 0}
+          style={{
+            padding: '14px 28px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: (!step1Passed || mainTimer > 0) ? '#1e293b' : subTimer2 > 0 ? '#334155' : step === 3 ? '#10b981' : '#ff0055',
+            color: (!step1Passed || mainTimer > 0) ? '#64748b' : '#fff',
+            fontWeight: 'bold',
+            fontSize: '15px',
+            cursor: (!step1Passed || mainTimer > 0 || subTimer2 > 0) ? 'not-allowed' : 'pointer',
+            width: '100%'
+          }}
+        >
+          {subTimer2 > 0 ? `جاري التوجيه (${subTimer2})...` : step < 3 ? `2. متابعة إلى المرحلة (${step + 1}/3) ←` : '2. فتح الرابط النهائي المباشر 🚀'}
+        </button>
+      </div>
+
+      {/* إعلان 5: سفلي */}
+      <div style={{ background: '#0f172a', border: '1px dashed #38bdf8', padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', margin: '20px 0', borderRadius: '8px' }}>
+        [ مساحة إعلانية 5: سفلية 728x90 ]
       </div>
 
     </div>
