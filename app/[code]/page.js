@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 
 // ضع رابط البوب أب / Direct Link الخاص بك هنا
-const POPUP_AD_URL = 'https://www.google.com';
+const POPUP_AD_URL = 'https://www.profitableratecpmnetwork.com/r3b7dixnds?key=523cd437bfb3a673d9afe33c5a41a35d';
 
 export default function FastUltraRedirect({ params }) {
   const { code } = params;
@@ -118,12 +118,32 @@ export default function FastUltraRedirect({ params }) {
 
       {/* إعلان 1: علوي */}
       <div style={{ background: '#0f172a', border: '1px dashed #38bdf8', padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '16px', borderRadius: '8px' }}>
-        [ مساحة إعلانية 1: علوية رئيسية 728x90 ]
+       <script>
+  atOptions = {
+    'key' : '8824083875b75393556ad43f19ff78f5',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highrevenueformat.com/8824083875b75393556ad43f19ff78f5/invoke.js"></script>
+ 
       </div>
 
       {/* إعلان 2 */}
       <div style={{ background: '#0f172a', border: '1px dashed #ff0055', padding: '14px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px', borderRadius: '8px' }}>
-        [ مساحة إعلانية 2: شريط إعلاني 468x60 ]
+       <script>
+  atOptions = {
+    'key' : 'f6a70a2e1a25a5db61444a7dd240aec2',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highrevenueformat.com/f6a70a2e1a25a5db61444a7dd240aec2/invoke.js"></script>
+ 
       </div>
 
       {/* صندوق العداد والزر الأول */}
@@ -158,7 +178,17 @@ export default function FastUltraRedirect({ params }) {
 
       {/* إعلان 3: في الوسط */}
       <div style={{ background: '#0f172a', border: '1px dashed #38bdf8', padding: '18px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', margin: '20px 0', borderRadius: '8px' }}>
-        [ مساحة إعلانية 3: داخل المحتوى 300x250 ]
+       <script>
+  atOptions = {
+    'key' : 'aa6845a6aa8466a93f6f0addd208ca5a',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highrevenueformat.com/aa6845a6aa8466a93f6f0addd208ca5a/invoke.js"></script>
+ 
       </div>
 
       {/* فاصل مسافة إجباري لضمان نزول المستخدم وتصفح الإعلانات */}
@@ -168,7 +198,17 @@ export default function FastUltraRedirect({ params }) {
 
       {/* إعلان 4 */}
       <div style={{ background: '#0f172a', border: '1px dashed #ff0055', padding: '18px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', marginBottom: '20px', borderRadius: '8px' }}>
-        [ مساحة إعلانية 4: قبل الزر النهائي 300x250 ]
+        <script>
+  atOptions = {
+    'key' : 'aa6845a6aa8466a93f6f0addd208ca5a',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highrevenueformat.com/aa6845a6aa8466a93f6f0addd208ca5a/invoke.js"></script>
+
       </div>
 
       {/* الصندوق السفلي والزر الثاني */}
@@ -199,7 +239,17 @@ export default function FastUltraRedirect({ params }) {
 
       {/* إعلان 5: سفلي */}
       <div style={{ background: '#0f172a', border: '1px dashed #38bdf8', padding: '16px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', margin: '20px 0', borderRadius: '8px' }}>
-        [ مساحة إعلانية 5: سفلية 728x90 ]
+        <script>
+  atOptions = {
+    'key' : '8824083875b75393556ad43f19ff78f5',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highrevenueformat.com/8824083875b75393556ad43f19ff78f5/invoke.js"></script>
+
       </div>
 
     </div>
