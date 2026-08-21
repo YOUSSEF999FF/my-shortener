@@ -9,6 +9,16 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
+    export default function RootLayout({ children }) {
+  return (
+    <html lang="ar" dir="rtl">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {/* الصق كود وسم الميتا هنا */}
+        <meta name="e9ea747f0010408922fd" content="الكود-الطويل-الذي-نسخته" />
+      </head>
+      <body ...
+
       <body style={{
         margin: 0,
         padding: 0,
