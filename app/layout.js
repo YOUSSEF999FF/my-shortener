@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'مختصر الروابط السريع',
-  description: 'خدمة اختصار روابط احترافية وفائقة السرعة',
+  title: 'AHM X & YOUSSEF 999 | اختصار الروابط السريع',
+  description: 'منصة احترافية وفائقة السرعة لاختصار الروابط وحمايتها',
 };
 
 export default function RootLayout({ children }) {
@@ -12,17 +12,35 @@ export default function RootLayout({ children }) {
       <body style={{
         margin: 0,
         padding: 0,
-        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        backgroundColor: '#0f172a',
-        color: '#f8fafc',
+        fontFamily: 'Segoe UI, Tahoma, sans-serif',
+        backgroundColor: '#070a12',
+        color: '#f1f5f9',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'space-between'
       }}>
-        {children}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+          {children}
+        </div>
+
+        {/* حقوق الموقع الثابتة في كل صفحة */}
+        <footer style={{
+          width: '100%',
+          padding: '16px 0',
+          textAlign: 'center',
+          backgroundColor: '#0b0f19',
+          borderTop: '1px solid #1e293b',
+          fontSize: '13px',
+          fontWeight: 'bold',
+          color: '#94a3b8',
+          letterSpacing: '0.5px'
+        }}>
+          COPYRIGHT ©️ AHM X & YOUSSEF 999
+        </footer>
       </body>
     </html>
   );
 }
+
