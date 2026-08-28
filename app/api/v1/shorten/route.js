@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -10,7 +12,7 @@ export async function POST(request) {
     }
 
     const slug = Math.random().toString(36).substring(2, 7);
-    const short_url = `https://linkshort-pro.com/${slug}`;
+    const short_url = `https://${request.headers.get('host')}/${slug}`;
 
     return NextResponse.json({
       success: true,
@@ -29,4 +31,3 @@ export async function GET() {
     usage: "Send a POST request with JSON body { 'url': 'YOUR_URL' }"
   });
 }
-
